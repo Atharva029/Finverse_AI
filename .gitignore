@@ -1,0 +1,10 @@
+.env
+__pycache__/
+myenv/
+*.pyc
+.vscode/
+.idea/
+scratch/
+news_cache.json
+finverse_xgboost_output.json
+archive/

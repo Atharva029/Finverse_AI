@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FINVERSE - Intelligent Financial Dashboard</title>
+  <meta name="description"
+    content="AI-powered financial health analytics, credit scoring, anomaly detection, and personalized guidance.">
+  <meta name="theme-color" content="#0a0e1a">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2300d4aa'/><text x='50' y='68' text-anchor='middle' fill='%230a0e1a' font-family='sans-serif' font-size='55' font-weight='bold'>F</text></svg>">
+</head>
+
+<body>
+
+  <!-- ======== LOGIN SCREEN ======== -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-bg-grid"></div>
+    <div class="login-glow-orb login-glow-orb-1"></div>
+    <div class="login-glow-orb login-glow-orb-2"></div>
+
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-logo">
+          <div class="login-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <h1>FIN<span>VERSE</span></h1>
+        </div>
+        <p class="login-subtitle">Your intelligent financial health companion</p>
+
+        <div class="login-tabs">
+          <button class="login-tab active" data-tab="login" onclick="switchLoginTab('login')">Sign In</button>
+          <button class="login-tab" data-tab="register" onclick="switchLoginTab('register')">Register</button>
+        </div>
+
+        <!-- Auth Message (error/success feedback) -->
+        <div id="authMessage" class="auth-message" style="display:none;"></div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" class="form-input" placeholder="name@company.com" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="btn-primary">Sign In to Dashboard</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" style="display:none" onsubmit="handleRegister(event)">
+          <div class="form-group">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" class="form-input" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="regEmail">Email Address</label>
+            <input type="email" id="regEmail" class="form-input" placeholder="name@company.com" required>
+          </div>
+          <div class="form-group">
+            <label for="regPassword">Password</label>
+            <input type="password" id="regPassword" class="form-input" placeholder="Create a strong password"
+              minlength="6" required>
+          </div>
+          <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+
+        <div class="login-features">
+          <div class="login-feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Bank-grade security
+          </div>
+          <div class="login-feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            AI-powered insights
+          </div>
+          <div class="login-feature">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            Real-time analytics
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== APP LAYOUT ======== -->
+  <div class="app-layout" id="appLayout">
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+          <h2>FIN<span>VERSE</span></h2>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Overview</div>
+        <button class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          Dashboard
+        </button>
+        <button class="nav-item" data-page="transactions" onclick="navigateTo('transactions')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+          Transactions
+        </button>
+
+        <div class="nav-section-label">Analytics</div>
+        <button class="nav-item" data-page="spending" onclick="navigateTo('spending')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          Spending Analysis
+        </button>
+        <button class="nav-item" data-page="forecast" onclick="navigateTo('forecast')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          Future Prediction
+        </button>
+        <button class="nav-item" data-page="credit" onclick="navigateTo('credit')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path
+              d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+            </path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+          Credit Health
+        </button>
+
+        <div class="nav-section-label">Intelligence</div>
+        <button class="nav-item" data-page="anomaly" onclick="navigateTo('anomaly')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          Anomaly Detection
+          <span class="badge">3</span>
+        </button>
+        <button class="nav-item" data-page="news" onclick="navigateTo('news')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          Financial News
+        </button>
+        <button class="nav-item" data-page="copilot" onclick="navigateTo('copilot')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          AI Copilot
+          <span class="pulse-dot" style="margin-left:auto"></span>
+        </button>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">AK</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Alex Kumar</div>
+          <div class="sidebar-user-email">demo@finverse.ai</div>
+        </div>
+        <button class="sidebar-logout" onclick="handleLogout()" title="Sign out">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-toggle" onclick="toggleSidebar()">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="topbar-title">
+            <h1 id="pageTitle">Dashboard</h1>
+            <p id="pageSubtitle">Welcome back, Alex. Here's your financial overview.</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" placeholder="Search transactions...">
+          </div>
+          <button class="topbar-icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span class="notification-dot"></span>
+          </button>
+          <button class="topbar-icon-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Page Content Area -->
+      <div class="page-content">
+
+        <!-- ====== DASHBOARD PAGE ====== -->
+        <section class="page-section active" id="page-dashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon teal">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                </div>
+                <span class="stat-card-change up">+12.5%</span>
+              </div>
+              <div class="stat-card-value" id="totalBalance">₹24,580</div>
+              <div class="stat-card-label">Total Balance</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                    <polyline points="17 6 23 6 23 12"></polyline>
+                  </svg>
+                </div>
+                <span class="stat-card-change up">+8.2%</span>
+              </div>
+              <div class="stat-card-value" id="monthlyIncome">₹6,840</div>
+              <div class="stat-card-label">Monthly Income</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <span class="stat-card-change down">-3.1%</span>
+              </div>
+              <div class="stat-card-value" id="monthlySpending">₹4,230</div>
+              <div class="stat-card-label">Monthly Spending</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                    </path>
+                  </svg>
+                </div>
+                <span class="stat-card-change up">+15pts</span>
+              </div>
+              <div class="stat-card-value" id="creditScoreDashboard">742</div>
+              <div class="stat-card-label">Credit Score</div>
+            </div>
+          </div>
+
+          <div class="content-grid three-col">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Spending Trends</div>
+                  <div class="card-subtitle">Last 6 months overview</div>
+                </div>
+                <div class="card-actions">
+                  <button class="card-action-btn active">6M</button>
+                  <button class="card-action-btn">1Y</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="spendingTrendChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Category Split</div>
+                  <div class="card-subtitle">Last 6 months breakdown</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="category-list" id="categoryList">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Recent Transactions</div>
+                <div class="card-subtitle">Latest financial activity</div>
+              </div>
+              <div class="card-actions">
+                <button class="card-action-btn" onclick="navigateTo('transactions')">View All</button>
+              </div>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Description</th>
+                      <th>Category</th>
+                      <th>Amount</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboardTransactions">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== TRANSACTIONS PAGE ====== -->
+        <section class="page-section" id="page-transactions">
+          <div class="transaction-form-card">
+            <h3 style="font-size:1rem;font-weight:600;margin-bottom:20px;">Add New Transaction</h3>
+            <form onsubmit="addTransaction(event)">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Date</label>
+                  <input type="date" class="form-input" id="txnDate" required>
+                </div>
+                <div class="form-group">
+                  <label>Description</label>
+                  <input type="text" class="form-input" id="txnDesc" placeholder="e.g., Grocery Store" required>
+                </div>
+                <div class="form-group">
+                  <label>Category</label>
+                  <select class="form-select" id="txnCategory">
+                    <option value="food">Food & Dining</option>
+                    <option value="transport">Transport</option>
+                    <option value="shopping">Shopping</option>
+                    <option value="bills">Bills & Utilities</option>
+                    <option value="health">Healthcare</option>
+                    <option value="entertainment">Entertainment</option>
+                    <option value="income">Income</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Amount (₹)</label>
+                  <input type="number" class="form-input" id="txnAmount" placeholder="0.00" step="0.01" required>
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-accent">Add Transaction</button>
+                <button type="button" class="btn-secondary" onclick="generateDemoData()">Generate Demo Data</button>
+              </div>
+            </form>
+          </div>
+
+
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">All Transactions</div>
+                <div class="card-subtitle" id="txnCount">0 transactions</div>
+              </div>
+              <div class="card-actions">
+                <button class="card-action-btn active" onclick="filterTransactions('all')">All</button>
+                <button class="card-action-btn" onclick="filterTransactions('debit')">Expenses</button>
+                <button class="card-action-btn" onclick="filterTransactions('credit')">Income</button>
+              </div>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Description</th>
+                      <th>Category</th>
+                      <th>Amount</th>
+                      <th>Type</th>
+                    </tr>
+                  </thead>
+                  <tbody id="allTransactions">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== SPENDING ANALYSIS PAGE ====== -->
+        <section class="page-section" id="page-spending">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                </div>
+                <span class="stat-card-change down">-5.2%</span>
+              </div>
+              <div class="stat-card-value">₹4,230</div>
+              <div class="stat-card-label">This Month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon blue">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card-value">₹4,460</div>
+              <div class="stat-card-label">Monthly Average</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card-value">₹2,610</div>
+              <div class="stat-card-label">Savings This Month</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon red">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card-value">2</div>
+              <div class="stat-card-label">Overspend Alerts</div>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Monthly Spending</div>
+                  <div class="card-subtitle">Category-wise breakdown per month</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="monthlySpendChart"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Spending by Category</div>
+                  <div class="card-subtitle">Current month allocation</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="categoryPieChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Lifestyle Pattern Analysis</div>
+                <div class="card-subtitle">AI-detected spending behaviors and habits</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="lifestylePatterns">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== FORECASTING PAGE ====== -->
+        <section class="page-section" id="page-forecast">
+          <div class="forecast-summary">
+            <div class="forecast-item">
+              <div class="forecast-item-label">Predicted Next Month</div>
+              <div class="forecast-item-value" id="forecastNextMonth" style="color:var(--accent)">₹...</div>
+              <div class="forecast-item-change" id="forecastChange" style="color:var(--danger)">...</div>
+            </div>
+            <div class="forecast-item">
+              <div class="forecast-item-label">Highest Category</div>
+              <div class="forecast-item-value" id="forecastHighCatVal">₹...</div>
+              <div class="forecast-item-change" id="forecastHighCatName" style="color:var(--text-muted)">...</div>
+            </div>
+            <div class="forecast-item">
+              <div class="forecast-item-label">Savings Forecast</div>
+              <div class="forecast-item-value" id="forecastSavings" style="color:var(--success)">₹...</div>
+              <div class="forecast-item-change" id="forecastSavingsStatus" style="color:var(--success)">Evaluating...
+              </div>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="card full-width">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Spending Forecast (ML Prediction)</div>
+                  <div class="card-subtitle">Historical + predicted spending with confidence interval</div>
+                </div>
+                <div class="card-actions">
+                  <button class="card-action-btn active">3M</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container" style="height:300px">
+                  <canvas id="forecastChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="content-grid">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Category-Level Forecast</div>
+                  <div class="card-subtitle">Predicted expenses by category</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="categoryForecast">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Budget Recommendations</div>
+                  <div class="card-subtitle">AI-suggested budget adjustments</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="budgetRecs">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== CREDIT HEALTH PAGE ====== -->
+        <section class="page-section" id="page-credit">
+          <div class="content-grid">
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Alternative Credit Score</div>
+                  <div class="card-subtitle">Behavior-based credit assessment</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="credit-score-display">
+                  <div class="credit-ring">
+                    <svg viewBox="0 0 200 200">
+                      <circle class="credit-ring-bg" cx="100" cy="100" r="85"></circle>
+                      <circle class="credit-ring-fill" id="creditRingFill" cx="100" cy="100" r="85"
+                        stroke-dasharray="534" stroke-dashoffset="534"></circle>
+                    </svg>
+                    <div class="credit-ring-center">
+                      <div class="credit-score-value" id="creditScoreValue">0</div>
+                      <div class="credit-score-label">out of 900</div>
+                      <div class="credit-score-rating good" id="creditRating">Good</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="credit-factors" id="creditFactors">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-title">Credit Score Trend</div>
+                  <div class="card-subtitle">Last 12 months</div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-container" style="margin-bottom: 24px;">
+                  <canvas id="creditTrendChart"></canvas>
+                </div>
+                <div id="creditHistoryList">
+                  <!-- History table populated by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Risk Indicators</div>
+                <div class="card-subtitle">Key behavioral factors affecting your credit health</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="riskIndicators">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== ANOMALY DETECTION PAGE ====== -->
+        <section class="page-section" id="page-anomaly">
+          <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr)">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon red">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                    </path>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card-value" id="anomalyCount">...</div>
+              <div class="stat-card-label">Anomalies Detected</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon orange">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card-value" id="anomalyTotalAmount">...</div>
+              <div class="stat-card-label">Total Flagged Amount</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-card-icon green">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="stat-card-value" id="anomalyRate">...</div>
+              <div class="stat-card-label">Anomaly Rate</div>
+            </div>
+          </div>
+
+          <div id="anomalyAlerts">
+            <!-- Populated by JS -->
+          </div>
+
+          <div class="card" style="margin-top:24px">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Anomaly Pattern Graph</div>
+                <div class="card-subtitle">Transaction deviation from expected patterns</div>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container" style="height:280px">
+                <canvas id="anomalyChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== FINANCIAL NEWS PAGE ====== -->
+        <section class="page-section" id="page-news">
+          <div class="card-actions" style="margin-bottom:24px; display:flex; gap:8px;">
+            <button class="card-action-btn active" onclick="filterNews('all')">All News</button>
+            <button class="card-action-btn" onclick="filterNews('positive')">Positive</button>
+            <button class="card-action-btn" onclick="filterNews('negative')">Negative</button>
+            <button class="card-action-btn" onclick="filterNews('neutral')">Neutral</button>
+          </div>
+          <!-- FinBERT sentiment summary bar + recommendation (injected by JS) -->
+          <div id="newsSummaryBar"></div>
+          <div class="news-grid" id="newsGrid">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+
+        <!-- ====== AI COPILOT PAGE ====== -->
+        <section class="page-section" id="page-copilot">
+          <div class="copilot-container">
+            <div class="copilot-messages" id="copilotMessages">
+              <!-- Populated by JS -->
+            </div>
+            <div class="copilot-suggestions" id="copilotSuggestions">
+              <button class="suggestion-chip" onclick="sendSuggestion('How is my spending this month?')">How is my
+                spending this month?</button>
+              <button class="suggestion-chip" onclick="sendSuggestion('What is my credit score?')">What is my credit
+                score?</button>
+              <button class="suggestion-chip" onclick="sendSuggestion('Any unusual transactions?')">Any unusual
+                transactions?</button>
+              <button class="suggestion-chip" onclick="sendSuggestion('Give me savings tips')">Give me savings
+                tips</button>
+            </div>
+            <div class="copilot-input-area">
+              <textarea class="copilot-input" id="copilotInput" placeholder="Ask your financial AI assistant..."
+                rows="1" onkeydown="handleCopilotKeydown(event)"></textarea>
+              <button class="copilot-send" onclick="sendCopilotMessage()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/navigation.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/pages.js"></script>
+  <script src="js/copilot.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>
