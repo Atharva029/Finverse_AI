@@ -1,4 +1,4 @@
-# 💰 Finverse AI — Intelligent Personal Finance Dashboard
+# 💰 Finverse AI - Intelligent Personal Finance Dashboard
 
 > An AI-powered personal finance management system that combines machine learning, natural language processing, and real-time financial news to deliver actionable insights about your money.
 
@@ -15,12 +15,12 @@ Finverse AI is a full-stack personal finance application built as a TE (Third Ye
 
 ### Key Highlights
 
-- 🤖 **AI Financial Copilot** — Powered by Google Gemini (`gemma-3-27b-it`) for natural language Q&A on your finances
-- 📊 **Spending Analytics** — Rule-based 5-factor analysis with category breakdowns, trend tracking and lifestyle patterns
-- 🔍 **Anomaly Detection** — Isolation Forest ML model flags suspicious or unusual transactions
-- 📈 **Expense Forecasting** — XGBoost time-series model predicts spending for the next 90 days
-- 📰 **FinBERT Sentiment Analysis** — ProsusAI/FinBERT classifies live financial news from 4 APIs
-- 💳 **Credit Health Score** — Rule-based 5-factor credit score derived from transaction history
+- 🤖 **AI Financial Copilot** - Powered by Google Gemini (`gemma-3-27b-it`) for natural language Q&A on your finances
+- 📊 **Spending Analytics** - Rule-based 5-factor analysis with category breakdowns, trend tracking and lifestyle patterns
+- 🔍 **Anomaly Detection** - Isolation Forest ML model flags suspicious or unusual transactions
+- 📈 **Expense Forecasting** - XGBoost time-series model predicts spending for the next 90 days
+- 📰 **FinBERT Sentiment Analysis** - ProsusAI/FinBERT classifies live financial news from 4 APIs
+- 💳 **Credit Health Score** - Rule-based 5-factor credit score derived from transaction history
 
 ---
 
@@ -38,11 +38,11 @@ Finverse AI is a full-stack personal finance application built as a TE (Third Ye
 
 ### 📊 Spending Analytics
 Implements a **5-rule analytics engine**:
-1. **Category Aggregation** — Totals per category for the active month
-2. **Time-Based Analysis** — Month-over-month and 6-month trend comparison
-3. **Pattern Detection** — High-frequency categories, unusual spikes (>150% of average), recurring charges
-4. **Savings Calculation** — `Savings = Income − Expenses`, savings rate as a percentage
-5. **Alert Generation** — Automated warnings when spending exceeds 120% of average
+1. **Category Aggregation** - Totals per category for the active month
+2. **Time-Based Analysis** - Month-over-month and 6-month trend comparison
+3. **Pattern Detection** - High-frequency categories, unusual spikes (>150% of average), recurring charges
+4. **Savings Calculation** - `Savings = Income − Expenses`, savings rate as a percentage
+5. **Alert Generation** - Automated warnings when spending exceeds 120% of average
 
 ### 🔍 Anomaly Detection (Isolation Forest)
 - ML-powered using **scikit-learn's Isolation Forest**
@@ -302,7 +302,7 @@ The system supports the following expense categories:
 
 ## 📄 License
 
-This project was developed as an academic mini project (TE-A Mini Project 2B, 2025–26). All rights reserved by the authors.
+This project was developed as an academic mini project. All rights reserved by the authors.
 
 ---
 
