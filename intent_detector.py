@@ -7,7 +7,8 @@ class IntentDetector:
             'fraud_detection': ['fraud', 'suspicious', 'unusual', 'anomaly', 'scan', 'theft', 'unrecognized'],
             'savings_prediction': ['save', 'savings', 'emergency fund', 'budgeting tips', 'reduce expenses'],
             'expense_prediction': ['predict', 'forecast', 'next month', 'future spending', 'estimate spend'],
-            'news_analysis': ['news', 'market trend', 'economy', 'gdp', 'rbi', 'fintech news']
+            'news_analysis': ['news', 'market trend', 'economy', 'gdp', 'rbi', 'fintech news'],
+            'add_transaction': ['add', 'record', 'spent', 'spent on', 'bought', 'purchase', 'received', 'salary', 'income', 'expense']
         }
 
     def detect(self, query):

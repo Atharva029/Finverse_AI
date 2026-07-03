@@ -228,29 +228,78 @@ function generateDemoData() {
   renderAllPages();
 }
 
-function handleCSVUpload(event) {
+async function handleCSVUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
 
+  const userStr = sessionStorage.getItem('finverse_user');
+  if (!userStr) {
+    alert('Please log in to import transactions.');
+    return;
+  }
+  const user = JSON.parse(userStr);
+
   const reader = new FileReader();
-  reader.onload = function (e) {
-    const lines = e.target.result.split('\n');
-    lines.slice(1).forEach(line => {
+  reader.onload = async function (e) {
+    const text = e.target.result;
+    const lines = text.split('\n');
+    const importedTransactions = [];
+
+    // Skip header and process lines
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
       const parts = line.split(',');
       if (parts.length >= 4) {
-        transactions.push({
-          date: parts[0].trim(),
-          desc: parts[1].trim(),
-          category: parts[2].trim().toLowerCase() || 'other',
-          amount: parseFloat(parts[3]),
-          type: parseFloat(parts[3]) >= 0 ? 'credit' : 'debit'
+        // Expected CSV: Date(YYYY-MM-DD), Description, Category, Amount
+        const date = parts[0].trim();
+        const desc = parts[1].trim();
+        const category = parts[2].trim().toLowerCase() || 'other';
+        const amount = parseFloat(parts[3]);
+
+        importedTransactions.push({
+          date: date,
+          description: desc,
+          category: category,
+          amount: Math.abs(amount),
+          type: amount >= 0 ? 'income' : 'expense'
         });
       }
-    });
-    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-    renderAllPages();
+    }
+
+    if (importedTransactions.length === 0) {
+      alert('No valid transactions found in CSV.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE}/api/transactions/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          transactions: importedTransactions
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert(`Successfully imported ${data.count} transactions!`);
+        await loadTransactions();
+        renderAllPages();
+      } else {
+        alert('Import failed: ' + data.message);
+      }
+    } catch (error) {
+      console.error('CSV Import Error:', error);
+      alert('Error connecting to server during import.');
+    }
   };
   reader.readAsText(file);
+  
+  // Reset input
+  event.target.value = '';
 }
 
 // ---- Spending Analysis ----

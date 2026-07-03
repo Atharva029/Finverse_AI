@@ -1,4 +1,5 @@
 .env
+eve/
 __pycache__/
 myenv/
 *.pyc

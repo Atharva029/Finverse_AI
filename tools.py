@@ -486,6 +486,43 @@ class FinancialTools:
                 cursor.close()
                 conn.close()
 
+    def add_transaction(self, user_id, date, description, category, amount, txn_type):
+        """Add a single transaction to the database."""
+        conn = self.get_db_connection()
+        if not conn:
+            return {"success": False, "message": "Database connection failed."}
+        
+        try:
+            cursor = conn.cursor()
+            # Format date to DD-MM-YYYY HH:MM for updated_transactions table
+            # date comes as YYYY-MM-DD from LLM or frontend
+            try:
+                dt_obj = datetime.strptime(date, '%Y-%m-%d')
+                formatted_date = dt_obj.strftime('%d-%m-%Y %H:%M')
+            except ValueError:
+                formatted_date = date # Assume already formatted or handled
+
+            # Handle amount sign
+            final_amount = abs(float(amount))
+            if txn_type == 'expense':
+                final_amount = -final_amount
+
+            cursor.execute(
+                """INSERT INTO updated_transactions 
+                   (user_id, txn_date, description, category, txn_type, amount, created_at) 
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (user_id, formatted_date, description, category, txn_type, final_amount, datetime.now().strftime('%d-%m-%Y %H:%M'))
+            )
+            conn.commit()
+            return {"success": True, "message": "Transaction added successfully!", "txn_id": cursor.lastrowid}
+        except Error as e:
+            print(f"Add transaction error: {e}")
+            return {"success": False, "message": str(e)}
+        finally:
+            if conn.is_connected():
+                cursor.close()
+                conn.close()
+
     def load_financial_news(self):
         """Loads curated financial news from news_cache.json."""
         try:

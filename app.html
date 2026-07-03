@@ -428,6 +428,8 @@
               </div>
               <div class="form-actions">
                 <button type="submit" class="btn-accent">Add Transaction</button>
+                <button type="button" class="btn-secondary" onclick="document.getElementById('csvInput').click()">Import CSV</button>
+                <input type="file" id="csvInput" style="display:none" accept=".csv" onchange="handleCSVUpload(event)">
                 <button type="button" class="btn-secondary" onclick="generateDemoData()">Generate Demo Data</button>
               </div>
             </form>

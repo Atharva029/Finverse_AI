@@ -36,13 +36,16 @@ class FinverseRAGAgent:
         - Detect financial mistakes
         - Suggest saving strategies
         - Use financial news to suggest safe financial awareness
+        - You CAN and SHOULD summarize the provided financial news to explain current market sentiment if asked
+        - You CAN provide general investment tips based on the current market sentiment and the user's savings
         - Never hallucinate data
         - Only use the provided context
         - If data is missing, say it clearly
-        - Do NOT give guaranteed investment advice
         - Keep answers simple and practical
+        - If the user wants to ADD or RECORD a transaction, extract details and return:
+          CONFIRMATION: I have recorded a [type] of [amount] for [description] in the [category] category.
 
-        The response MUST strictly follow this format:
+        The response MUST strictly follow this format for insights:
         Insight:
         Explanation:
         Risk Level:
@@ -87,6 +90,27 @@ class FinverseRAGAgent:
             if response.candidates and len(response.candidates) > 0:
                 try:
                     ai_text = response.text
+                    
+                    # ─── AUTO-RECORD TRANSACTION ───
+                    if intent == 'add_transaction' and 'CONFIRMATION:' in ai_text:
+                        try:
+                            # Use a specific prompt to extract clean JSON from the AI's own confirmation
+                            extract_prompt = f"Extract transaction JSON from this text: '{ai_text}' and user query: '{query}'. Fields: amount (float), category (string), description (string), type (income/expense), date (YYYY-MM-DD). Return ONLY JSON."
+                            extraction = self.client.generate_content(extract_prompt)
+                            import re, json
+                            match = re.search(r'\{.*\}', extraction.text, re.DOTALL)
+                            if match:
+                                data = json.loads(match.group())
+                                self.tools.add_transaction(
+                                    user_id=user_id,
+                                    date=data.get('date', time.strftime('%Y-%m-%d')),
+                                    description=data.get('description', 'AI Recorded'),
+                                    category=data.get('category', 'other'),
+                                    amount=data.get('amount', 0),
+                                    txn_type=data.get('type', 'expense')
+                                )
+                        except Exception as e:
+                            print(f"Extraction Error: {e}")
                 except ValueError:
                     # If content was blocked, response.text will raise a ValueError
                     ai_text = "I'm sorry, I cannot answer that question as it was flagged by my safety filters. Please try rephrasing your request."

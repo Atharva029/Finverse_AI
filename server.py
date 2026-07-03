@@ -60,10 +60,10 @@ def test_db_connection():
     """Verify database connectivity on startup."""
     conn = get_db_connection()
     if conn and conn.is_connected():
-        print(f"✅ Connected to MySQL database: {os.getenv('DB_NAME', 'finverse_ai')}")
+        print(f"Connected to MySQL database: {os.getenv('DB_NAME', 'finverse_ai')}")
         conn.close()
     else:
-        print("❌ Failed to connect to MySQL. Check your .env credentials.")
+        print("Failed to connect to MySQL. Check your .env credentials.")
 
 def get_user_monthly_savings(user_id):
     """Calculate savings for the current (or most recent active) month."""
@@ -202,7 +202,7 @@ def login():
             'user': {
                 'id': user['user_id'],
                 'name': user['name'],
-                'email': user['email']
+                                'email': user['email']
             }
         }), 200
 
@@ -285,6 +285,69 @@ def add_transaction():
             if 'cursor' in dir() and cursor:
                 cursor.close()
             conn.close()
+
+
+@app.route('/api/transactions/bulk', methods=['POST'])
+def add_transactions_bulk():
+    """Add multiple transactions for the logged-in user (e.g., from CSV)."""
+    data = request.get_json()
+    user_id = data.get('user_id')
+    txns = data.get('transactions', [])
+    
+    if not user_id or not txns:
+        return jsonify({'success': False, 'message': 'User ID and transactions list are required.'}), 400
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'success': False, 'message': 'Database connection failed.'}), 500
+    
+    try:
+        cursor = conn.cursor()
+        from datetime import datetime
+        
+        count = 0
+        for txn in txns:
+            txn_date = txn.get('date')
+            description = txn.get('description', '').strip()
+            category = txn.get('category', 'other').strip()
+            amount = float(txn.get('amount', 0))
+            txn_type = txn.get('type', 'expense').strip()
+            
+            # Handle amount sign
+            final_amount = abs(amount)
+            if txn_type == 'expense':
+                final_amount = -final_amount
+            
+            # Format date
+            try:
+                date_obj = datetime.strptime(txn_date, '%Y-%m-%d')
+                formatted_date = date_obj.strftime('%d-%m-%Y 00:00')
+            except:
+                formatted_date = txn_date # Fallback
+            
+            cursor.execute(
+                """INSERT INTO updated_transactions 
+                   (user_id, txn_date, description, category, txn_type, amount, created_at) 
+                   VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (user_id, formatted_date, description, category, txn_type, final_amount, datetime.now().strftime('%d-%m-%Y %H:%M'))
+            )
+            count += 1
+            
+        conn.commit()
+        return jsonify({
+            'success': True,
+            'message': f'Successfully imported {count} transactions.',
+            'count': count
+        }), 201
+        
+    except Exception as e:
+        print(f"Bulk import error: {e}")
+        return jsonify({'success': False, 'message': f'Failed to import transactions: {str(e)}'}), 500
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+
 
 
 @app.route('/api/transactions', methods=['GET'])
@@ -929,17 +992,30 @@ def get_news_sentiment():
         articles = []
         for r in results:
             headline = r['headline']
+            excerpt = (headline[:160] + '…') if len(headline) > 160 else headline
             articles.append({
                 'title'     : headline,
                 'source'    : r['source'],
                 'sentiment' : r['label'],
-                'score'     : r['score'],
+                'score'     : float(r['score']), # Force standard Python float to prevent JSON serialization crashes
                 'category'  : detect_category(headline) or 'General Market',
                 'fetched_at': r['fetched_at'],
                 'url'       : r.get('url', ''),
-                'excerpt'   : (headline[:160] + '…') if len(headline) > 160 else headline,
+                'excerpt'   : excerpt,
+                'summary'   : excerpt,  # Added for AI Copilot compatibility
                 'time'      : r['fetched_at'][:16] if r.get('fetched_at', '—') != '—' else 'Live',
             })
+
+        # Overwrite static cache with LIVE FinBERT news so Copilot uses real data
+        # Use atomic write to prevent empty files if it crashes midway
+        try:
+            import os
+            temp_file = 'news_cache.json.tmp'
+            with open(temp_file, 'w', encoding='utf-8') as f:
+                json.dump(articles, f, ensure_ascii=False, indent=2)
+            os.replace(temp_file, 'news_cache.json')
+        except Exception as e:
+            print(f"[News] Failed to update news_cache.json for Copilot: {e}")
 
         sentiment_counts = {
             'positive': sum(1 for a in articles if a['sentiment'] == 'positive'),
